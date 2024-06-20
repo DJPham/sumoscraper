@@ -1,2 +1,18 @@
 # Ignore virtual environments
 venv/
+
+# Ignore database file
+sumo_data.db
+
+# Ignore Python compiled files
+*.pyc
+__pycache__/
+
+# Additional common ignores
+*.log
+*.sqlite3
+*.env
+.DS_Store
+.vscode/
+.idea/
+*.swp
