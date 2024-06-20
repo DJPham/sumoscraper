@@ -50,10 +50,3 @@ class Database:
 
     def close(self):
         self.connection.close()
-
-db = Database('sumo_data.db')
-
-#db.clear_table()
-
-db.print()
-db.close()

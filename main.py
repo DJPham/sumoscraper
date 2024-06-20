@@ -79,3 +79,10 @@ process = CrawlerProcess()
 process.crawl(SumoSpider)
 
 process.start()
+
+db = Database('sumo_data.db')
+
+#db.clear_table()
+
+db.print()
+db.close()
