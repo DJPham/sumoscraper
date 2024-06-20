@@ -20,7 +20,8 @@ class Database:
                     ranking TEXT NOT NULL,
                     name TEXT NOT NULL,                    
                     origin TEXT NOT NULL,
-                    stable TEXT NOT NULL)
+                    stable TEXT NOT NULL,
+                    UNIQUE(ranking, name, origin, stable))
         ''')
 
     def clear_table(self):
@@ -28,14 +29,18 @@ class Database:
         #self.cursor.execute('DELETE FROM rikishi')
 
         # uncomment if you want to delete the table entirely
-        #self.cursor.execute('DROP TABLE rikishi')
+        self.cursor.execute('DROP TABLE rikishi')
 
         self.connection.commit()
 
     def insert_rikishi(self, ranking, name, origin, stable):
-        self.cursor.execute('INSERT INTO rikishi (ranking, name, origin, stable) VALUES (?, ?, ?, ?)', (ranking, name, origin, stable))
+        try:
+            self.cursor.execute('INSERT INTO rikishi (ranking, name, origin, stable) VALUES (?, ?, ?, ?)', (ranking, name, origin, stable))
 
-        self.connection.commit()    
+            self.connection.commit()
+        except sqlite3.IntegrityError:
+            # If a record already exists, you can log it or handle it as needed
+            print(f"Record already exists: {name}, {origin}, {stable}")
 
     # test if values inserted correctly
     def print(self):

@@ -16,6 +16,9 @@ import time
 # import the database class
 from database import Database
 
+# import the viz class
+from visualizations import Visualization
+
 class SumoSpider(scrapy.Spider):
     name = 'sumo_spider'
     # the spider will start scraping from the home page
@@ -86,3 +89,10 @@ db = Database('sumo_data.db')
 
 db.print()
 db.close()
+
+viz = Visualization('sumo_data.db')
+
+viz.fetch_data()
+viz.plot_origin_distribution()
+viz.plot_stable_distribution()
+viz.close()
