@@ -13,6 +13,9 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 import time
 
+# import the database class
+from database import Database
+
 class SumoSpider(scrapy.Spider):
     name = 'sumo_spider'
     # the spider will start scraping from the home page
@@ -25,6 +28,9 @@ class SumoSpider(scrapy.Spider):
 
         # initialize the Chrome Webdriver
         self.driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
+
+        # initialize the database class
+        self.db = Database('sumo_data.db')
 
     def parse(self, response):
         # it will try and find the "Find Rikishi" link
@@ -40,21 +46,33 @@ class SumoSpider(scrapy.Spider):
             # could swap with WebDriverWait for more precise control
             time.sleep(5)
 
-            # using selenium's functions to drive down to the specific code
-            # returns the names of every sumo wrestler in Makuuchi division
-            rikishi_elements = self.driver.find_elements(By.CSS_SELECTOR, 'table.mdTable3 tbody tr td.mdBr:first-of-type a')
+            rikishi_rank_elements = self.driver.find_elements(By.CSS_SELECTOR, 'table.mdTable3 th a')
+            rikishi_name_elements = self.driver.find_elements(By.CSS_SELECTOR, 'table.mdTable3 tbody tr td.mdBr:first-of-type a')
+            rikishi_origin_elements = self.driver.find_elements(By.CSS_SELECTOR, 'table.mdTable3 tbody tr td.mdBr:nth-of-type(2) a')
+            rikishi_stable_elements = self.driver.find_elements(By.CSS_SELECTOR, 'table.mdTable3 tbody tr td:nth-of-type(3) a')
 
             # extract the values and put into an array
-            rikishi_names = [element.text for element in rikishi_elements]
+            rikishi_names = [element.text for element in rikishi_name_elements]
+            rikishi_ranks = [element.text for element in rikishi_rank_elements]
+            rikishi_origins = [element.text for element in rikishi_origin_elements]
+            rikishi_stables = [element.text for element in rikishi_stable_elements]
 
-            for name in rikishi_names:
-                self.log(name)
+            for rank, name, origin, stable in zip(rikishi_ranks, rikishi_names, rikishi_origins, rikishi_stables):
+                self.log(f"Rank: {rank}, Name: {name}, Origin: {origin}, Stable: {stable}")
 
-            yield {'rikishi_names': rikishi_names}
+                self.db.insert_rikishi(rank, name, origin, stable)
 
-    # used to properly close selenium whenever the spider is closed
+            yield {
+                'rikishi_ranking': rikishi_ranks, 
+                'rikishi_names': rikishi_names, 
+                'rikishi_origin': rikishi_origins, 
+                'rikishi_stable': rikishi_stables
+                }
+
+    # used to properly close selenium and database connection whenever the spider is closed
     def closed(self, reason):
         self.driver.quit()
+        self.db.close()
 
 process = CrawlerProcess()
 
