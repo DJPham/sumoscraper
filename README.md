@@ -63,6 +63,10 @@ Each row in the rikishi table represents a sumo wrestler with their name, rankin
 
 ### Visualizations
 
+The project includes the functionality to run a few visualizations that showcases the distribution of the origin and stable of the rikishi.
+
+When you run the code, the visualizations will appear and will also be saved in a folder called "viz" that you can access as well.
+
 ### License 
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
